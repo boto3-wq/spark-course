@@ -26,8 +26,8 @@ services:
       - "8081:8081"
     environment:
       - SPARK_MODE=worker
-      - SPARK_WORKER_CORES=2
-      - SPARK_WORKER_MEMORY=1g
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2g
       - SPARK_MASTER_URL=spark://spark-master:7077
     networks:
       - spark-network
@@ -43,21 +43,20 @@ services:
       - "8082:8081"
     environment:
       - SPARK_MODE=worker
-      - SPARK_WORKER_CORES=2
-      - SPARK_WORKER_MEMORY=1g
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2g
       - SPARK_MASTER_URL=spark://spark-master:7077
     networks:
       - spark-network
 
   jupyter:
-    image: jupyter/pyspark-notebook:python-3.8
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
     container_name: jupyter-pyspark
     hostname: jupyter
     ports:
       - "8888:8888"
-    environment:
-      - JUPYTER_ENABLE_LAB=yes
-      - GRANT_SUDO=yes
     volumes:
       - ./notebooks:/home/jovyan/work
     networks:
