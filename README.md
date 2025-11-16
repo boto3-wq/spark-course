@@ -21,6 +21,9 @@ docker-compose up -d --build
 
 # 상태 확인
 docker-compose ps
+
+# graceful 종료 이후 재시작
+docker-compose start
 ```
 
 ## 접속 정보
