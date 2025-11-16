@@ -1,14 +1,19 @@
+version: '3'
+
 services:
   spark-master:
-    image: apache/spark:3.5.0  # ← Apache 공식 이미지
+    image: apache/spark:3.5.0
     container_name: spark-master
     hostname: spark-master
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    command: bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "8080:8080"
       - "7077:7077"
-    volumes:
-      - ./data:/opt/spark-data
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
     networks:
       - spark-network
 
@@ -16,16 +21,18 @@ services:
     image: apache/spark:3.5.0
     container_name: spark-worker-1
     hostname: spark-worker-1
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
-    environment:
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./data:/opt/spark-data
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     depends_on:
       - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=1g
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     networks:
       - spark-network
 
@@ -33,16 +40,18 @@ services:
     image: apache/spark:3.5.0
     container_name: spark-worker-2
     hostname: spark-worker-2
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
-    environment:
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-    ports:
-      - "8082:8081"
-    volumes:
-      - ./data:/opt/spark-data
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     depends_on:
       - spark-master
+    ports:
+      - "8082:8081"
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=1g
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     networks:
       - spark-network
 
@@ -50,18 +59,19 @@ services:
     image: jupyter/pyspark-notebook:latest
     container_name: jupyter-pyspark
     hostname: jupyter
+    ports:
+      - "8888:8888"
     environment:
       - JUPYTER_ENABLE_LAB=yes
       - GRANT_SUDO=yes
-    ports:
-      - "8888:8888"
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     volumes:
       - ./notebooks:/home/jovyan/work
-      - ./data:/home/jovyan/data
-    depends_on:
-      - spark-master
     networks:
       - spark-network
+    depends_on:
+      - spark-master
 
 networks:
   spark-network:
