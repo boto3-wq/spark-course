@@ -12,6 +12,8 @@ services:
       - SPARK_MASTER_HOST=spark-master
       - SPARK_MASTER_PORT=7077
       - SPARK_MASTER_WEBUI_PORT=8080
+    volumes:
+      - ./notebooks:/home/jovyan/work
     networks:
       - spark-network
 
@@ -29,6 +31,8 @@ services:
       - SPARK_WORKER_CORES=1
       - SPARK_WORKER_MEMORY=2g
       - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - ./notebooks:/home/jovyan/work
     networks:
       - spark-network
 
@@ -46,6 +50,8 @@ services:
       - SPARK_WORKER_CORES=1
       - SPARK_WORKER_MEMORY=2g
       - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - ./notebooks:/home/jovyan/work
     networks:
       - spark-network
 
