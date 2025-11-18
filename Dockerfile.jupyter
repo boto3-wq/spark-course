@@ -1,7 +1,8 @@
 FROM python:3.8-slim
 
+# 여기에 build-essential 추가!
 RUN apt-get update && \
-    apt-get install -y openjdk-17-jre-headless wget procps && \
+    apt-get install -y openjdk-17-jre-headless wget procps build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
